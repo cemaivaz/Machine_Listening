@@ -2,6 +2,9 @@
 [x,fs]=wavread('i.wav');
 ms1=fs/1000;                 % maximum speech Fx at 1000Hz
 ms20=fs/50;                  % minimum speech Fx at 50Hz
+
+ms1 = 1;
+ms20 = length(x);
 %
 % plot waveform
 t=(0:length(x)-1)/fs;        % times of sampling instants
@@ -33,3 +36,11 @@ plot(q,abs(C(ms1:ms20)));
 legend('Cepstrum');
 xlabel('Quefrency (s)');
 ylabel('Amplitude');
+
+
+figure();
+c = cceps(x);
+
+plot(t,c)
+xlabel('Time (s)')
+title('Complex cepstrum')

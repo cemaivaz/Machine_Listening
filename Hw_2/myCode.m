@@ -72,6 +72,7 @@ formantVals
 
 % Create WAV file in the current folder.
 
+%%
 load handel.mat
 
 figure;
@@ -100,7 +101,6 @@ freq=linspace(0,rate/2,nfft/2+1);
 
 FFT_log = 20 * log10 ( abs( fft( x, nfft ) ) ); %decibel is measured 
 
-in
 
 %terms of logarithm
 
