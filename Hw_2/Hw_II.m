@@ -1,6 +1,31 @@
-close all;
 clear all;
+close all;
 clc;
+files = dir('vowels');
+
+fileN = [];
+
+for file = files';
+    
+    char(file.name)
+    if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
+        fileN = [fileN; char(strcat(strcat('vowels\', char(file.name))))];
+    end
+    
+end
+
+allData = cellstr(fileN);
+
+for u = 1:length(allData)
+    
+    
+    fileMv = allData(u);
+    fileMv = char(fileMv);
+
+end
+
+
+
 figure(8);
 % get a section of vowel
 [x,fs]=wavread('i.wav');
@@ -43,12 +68,14 @@ ylabel('Amplitude');
 
 % figure(8);
 % c = cceps(s2);
-% 
+%
 % plot(t,c)
 % xlabel('Time (s)')
 % title('Complex cepstrum')
 
 %%
+
+%SMOOTHED PLOT
 
 %Time Waveform
 
@@ -57,7 +84,7 @@ t = 0:1/fs:(length(x)-1)/fs;
 figure(1);
 subplot(3,2,1)
 plot(t,x);
-title('Time Waveform of the Word example'); xlabel('Time(s)');ylabel('Amplitude')  
+title('Time Waveform of the Word example'); xlabel('Time(s)');ylabel('Amplitude')
 
 
 %Narrowband Spectrogram and WideBand Spectrogram
@@ -74,7 +101,7 @@ title('Wideband spectrogram');
 
 %--------------------------------------------------------------------------
 
-%Time Waveform of Phoneme 
+%Time Waveform of Phoneme
 xa = 0.06;                 % These values where varied according to the respective waveform of the word being plotted
 xb = 0.17;
 subplot(3,2,2)
@@ -84,7 +111,7 @@ title('Time Waveform of Phoneme ')
 xlabel('Time (s)')
 ylabel('Amplitude')
 
-%Extracting 30 ms of the waveform 
+%Extracting 30 ms of the waveform
 xstart = 0.05;
 subplot(3,2,4)
 plot(t,x)
@@ -96,7 +123,7 @@ sample=x(xstart*fs:(xstart+.030)*fs);
 
 %Magnitude Spectrum and Linear Prediction Spectral Envelope
 mag = abs(fft(sample,1024));
-mag = mag(1:512);     
+mag = mag(1:512);
 freq = 0:8000/N:8000-1;
 subplot(3,2,6)
 plot(freq,db(mag/1024));      % divide by 1024 to normalize after fourier transform
@@ -114,25 +141,14 @@ plot(freq, 20*log10(abs(lspec)),'k');
 axis tight;
 title('Magnitude Spectrum in Blue & Smoothed Spectral Envelope in Black');
 
-%3D PLOT as a function of Time, Frequency and Power Density
-figure(2)
-fD = 0:8000/N:8000-1;
-fD = fD';
-[S,F,T,W] = spectrogram(x,hamming(N),floor(N/9),fD,fs);
-[a,b]=meshgrid(-2:1:2,-2:1:2);
-surf(freq,T,db(abs(W'))); hold on;
-title('3-D plot of recorded word')
-xlabel('Frequency,  Hz');
-ylabel('Time, s');
-zlabel('Power Spectral Density, dB');
-h = surf(freq,T,db(abs(W')));
-set(h,'edgecolor','none')
+
 
 
 %%
 
+%FORMANT FREQUENCIES
 
-figure(12);
+
 % Read the data back into MATLAB, and listen to audio.
 
 [y, Fs, nbits, readinfo] = wavread('i.wav');
@@ -149,13 +165,7 @@ NFFT = 128;
 
 [y_,freq,time,p] = spectrogram(y,len,noverlap,NFFT,Fs);
 
-surf(time,freq,10*log10(abs(p)),'EdgeColor','none');
 
-axis xy; axis tight; colormap(jet); view(0,90);
-
-xlabel('Time');
-
-ylabel('Frequency (in terms of Hz)');
 
 tSpl = 1/Fs;
 
@@ -165,7 +175,7 @@ endInd = round(0.8/tSpl)
 
 %vals = y(stInd:endInd);
 
-vals = y(1:size(y, 1));
+vals = y;
 
 x1 = vals.*hamming(length(vals));
 
@@ -174,7 +184,7 @@ preemph = [1/4 1/4 1/4 1/4];
 x1 = filter(1,preemph,x1);
 
 
-formNo = 3;
+formNo = 2;
 A = lpc(x1, formNo * 2 + 2);
 
 
@@ -193,15 +203,15 @@ i = 1;
 [c3, ind] = max(size(freqs));
 
 for j = 1:c3
-
- if (freqs(j) > 90 && bw(j) <400)
-
- formantVals(i) = freqs(j);
-
- i = i+1;
-
- end
-
+    
+    if (freqs(j) > 90 && bw(j) <400)
+        
+        formantVals(i) = freqs(j);
+        
+        i = i+1;
+        
+    end
+    
 end
 
 formantVals(end:-1:end - 1)
