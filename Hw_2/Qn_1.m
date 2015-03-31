@@ -194,6 +194,7 @@ for u = 1:length(allData)
             nn = nn+1;
         end
     end
+    fileMv(8:end)
     formants
 end
 
