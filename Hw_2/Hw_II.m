@@ -44,6 +44,9 @@ xlabel('Time (s)');
 ylabel('Amplitude');
 %
 % do fourier transform of windowed signal
+ms1=fs/1000;                 % maximum speech Fx at 1000Hz
+ms20=fs/50;                  % minimum speech Fx at 50Hz
+
 Y=fft(x.*hamming(length(x)));
 %
 % plot spectrum of bottom 5000Hz
@@ -105,12 +108,12 @@ Y=fft(x.*hamming(length(x)));
 % plot spectrum of bottom 5000Hz
 hz5000=5000*length(Y)/fs;
 f=(0:hz5000)*fs/length(Y);
-subplot(3,2,3);
+subplot(3,2,5);
 
-%
+% cceps could have also been used
 % cepstrum is DFT of log spectrum
 C=fft(log(abs(Y)+eps));
-%
+%5
 % plot between 1ms (=1000Hz) and 20ms (=50Hz)
 ms1 = 1;
 ms20 = length(x);
@@ -131,6 +134,20 @@ title('Time Waveform of Phoneme ')
 xlabel('Time (s)')
 ylabel('Amplitude')
 
+ms1=fs/1000;                 % maximum speech Fx at 1000Hz
+ms20=fs/50;                  % minimum speech Fx at 50Hz
+
+Y=fft(x.*hamming(length(x)));
+%
+% plot spectrum of bottom 5000Hz
+hz5000=5000*length(Y)/fs;
+f=(0:hz5000)*fs/length(Y);
+subplot(3,2,2);
+plot(f,20*log10(abs(Y(1:length(f)))+eps));
+title('Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude (dB)');
+
 %Extracting 30 ms of the waveform
 xstart = 0.05;
 subplot(3,2,4)
@@ -140,6 +157,27 @@ title('Time Waveform of 30 ms of the Phoneme')
 xlabel('Time (s)')
 ylabel('Amplitude')
 sample=x(xstart*fs:(xstart+.030)*fs);
+
+
+
+% cepstrum is DFT of log spectrum
+C=fft(log(abs(Y)+eps));
+%
+% plot between 1ms (=1000Hz) and 20ms (=50Hz)
+q=(ms1:ms20)/fs;
+subplot(3,2,4);
+plot(q,abs(C(ms1:ms20)));
+title('Cepstrum');
+xlabel('Quefrency (s)');
+ylabel('Amplitude');
+
+
+%
+% do fourier transform of windowed signal
+
+%
+
+%
 
 %Magnitude Spectrum and Linear Prediction Spectral Envelope
 mag = abs(fft(sample,1024));
