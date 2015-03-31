@@ -189,7 +189,7 @@ vals = y;
 x1 = vals.*hamming(length(vals));
 
 %Degisik preemph'ler icin dene
-preemph = [1];
+preemph = [1 0.63];
 
 x1 = filter(1,preemph,x1);
 
@@ -198,15 +198,15 @@ formNo = 2;
 A = lpc(x1, formNo * 2 + 2);
 
 
-roots = roots(A);
+roots_ = roots(A);
 
-roots = roots(imag(roots)>=0);
+roots_ = roots_(imag(roots_)>=0);
 
-angz = atan2(imag(roots),real(roots));
+angz = atan2(imag(roots_),real(roots_));
 
 [freqs,index] = sort(angz.*(Fs/(2*pi)));
 
-bw = -1/2*(Fs/(2*pi))*log(abs(roots(index)));
+bw = -1/2*(Fs/(2*pi))*log(abs(roots_(index)));
 
 i = 1;
 
