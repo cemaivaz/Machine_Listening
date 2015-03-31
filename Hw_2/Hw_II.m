@@ -99,6 +99,26 @@ win = hamming(N);
 spectrogram(x,win,round(0.97*N),N,fs);
 title('Wideband spectrogram');
 
+% do fourier transform of windowed signal
+Y=fft(x.*hamming(length(x)));
+%
+% plot spectrum of bottom 5000Hz
+hz5000=5000*length(Y)/fs;
+f=(0:hz5000)*fs/length(Y);
+subplot(3,2,3);
+
+%
+% cepstrum is DFT of log spectrum
+C=fft(log(abs(Y)+eps));
+%
+% plot between 1ms (=1000Hz) and 20ms (=50Hz)
+ms1 = 1;
+ms20 = length(x);
+q=(ms1:ms20)/fs;
+plot(q,abs(C(ms1:ms20)));
+title('Cepstrum');
+xlabel('Quefrency (s)');
+ylabel('Amplitude');
 %--------------------------------------------------------------------------
 
 %Time Waveform of Phoneme
@@ -137,7 +157,7 @@ p=fs/1000 + 4;
 [a,g]=lpc(sample,p);
 lspec = freqz(g,a,freq,fs);
 subplot(3,2,6)
-plot(freq, 20*log10(abs(lspec)),'k');
+plot(freq, 20*log10(abs(lspec)),'r');
 axis tight;
 title('Magnitude Spectrum in Blue & Smoothed Spectral Envelope in Black');
 
