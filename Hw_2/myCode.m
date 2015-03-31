@@ -1,4 +1,6 @@
 
+clear all;
+close all;
 % Read the data back into MATLAB, and listen to audio.
 
 [y, Fs, nbits, readinfo] = wavread('i.wav');
