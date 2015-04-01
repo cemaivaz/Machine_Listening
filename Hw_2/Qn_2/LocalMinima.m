@@ -2,7 +2,7 @@
 %
 %findspositionsofallstrictlocalminimaininputarray
 
-function mins=LocalMinima(x)
+function mins=localminima(x)
 
 nPoints=length(x);
 Middle=x(2:(nPoints-1));

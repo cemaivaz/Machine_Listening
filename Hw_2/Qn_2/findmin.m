@@ -15,9 +15,9 @@
 
 function[ti minCount]=findmin(data,nMins,spred,maxMinValue)
 
-[nm]=size(data);%Flipsvectorcorrect!
+[n m]=size(data);%Flipsvectorcorrect!
 if m==1
-data=data';
+    data=data';
 end
 
 minimas=localminima(data)';%LocatesALLminimasindataasindexes
@@ -29,17 +29,17 @@ minimas(indexes,:)=[];%DeletesminimasthatexcidemaxMinValue
 [m n]=size(minimas);%Newsizeofminsmatrix
 
 if m>=1%Onlyrunsifdataareavailable
-ti=zeros(nMins,2);%Allocatesnumberofsmallestminimaswanted
-for i=1:nMins
-[minima mIndex]=min(minimas(:,2));%Findsglobalminamongminimas
-ti(i,:)=minimas(mIndex,:);%Copiesfoundglobalminimaintronewmatrice
-indexes=find(abs(minimas(mIndex,1)-minimas(:,1))<spred);%Findsindexesofminimaswithin’spred’samples offoundminima
-minimas([mIndexindexes'],:)=[];%Deletesminimawithin’spred’samplesoffoundminima
-if length(minimas)<=0%Breakloopifnomoredata
-ti(i+1:end,:)=[];%Deletesusedallocatedspace
-break;
-end
-end
+    ti=zeros(nMins,2);%Allocatesnumberofsmallestminimaswanted
+    for i=1:nMins
+        [minima mIndex]=min(minimas(:,2));%Findsglobalminamongminimas
+        ti(i,:)=minimas(mIndex,:);%Copiesfoundglobalminimaintronewmatrice
+        indexes=find(abs(minimas(mIndex,1)-minimas(:,1))<spred);%Findsindexesofminimaswithin’spred’samples offoundminima
+        minimas([mIndex indexes'],:)=[];%Deletesminimawithin’spred’samplesoffoundminima
+        if length(minimas)<=0%Breakloopifnomoredata
+            ti(i+1:end,:)=[];%Deletesusedallocatedspace
+            break;
+        end
+    end
 else
-ti=zeros(0,2);%Allocatesa0?by?2matrix(toavoidruntimeerror)
+    ti=zeros(0,2);%Allocatesa0?by?2matrix(toavoidruntimeerror)
 end
