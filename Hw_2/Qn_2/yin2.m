@@ -20,7 +20,7 @@ if nargin<2; p=[]; end
 if nargin<1; error('!'); end
  
 % defaults
-if ~isfield(p, 'maxprd'); p.maxprd=100; end
+if ~isfield(p, 'maxprd'); p.maxprd=256; end
 if ~isfield(p, 'minprd'); p.minprd=2; end
 if ~isfield(p, 'wsize'); p.wsize=p.maxprd; end
 if ~isfield(p, 'hop'); p.hop=p.wsize; end
@@ -32,8 +32,6 @@ x=x(:);
 nsamples=numel(x);
  
 nframes=floor((nsamples-p.maxprd-p.wsize)/p.hop);
-
-nframes
 pwr=zeros(1,nframes);
 prd=zeros(1,nframes);
 ap=zeros(1,nframes);
@@ -41,6 +39,8 @@ ap=zeros(1,nframes);
 % shifted data
 x=convmtx(x,p.maxprd+1);
 x=x(p.maxprd:end-p.maxprd,:);
+
+
  
 for k=1:nframes
    
