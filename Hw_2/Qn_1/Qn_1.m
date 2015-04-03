@@ -31,71 +31,66 @@ for u = 1:length(allData)
     
     %%
     
-    %SMOOTHED PLOT
+    %Graphics section
     
     %Time Waveform
     
-    [x,fs,bits] = wavread(fileMv);
-    t = 0:1/fs:(length(x)-1)/fs;
+    [data,fs] = wavread(fileMv);
+    t = 0:1/fs:(length(data)-1)/fs;
     figure(u);
-    subplot(3,2,1)
-    plot(t,x);
-    title(strcat('Time Waveform of "', fileMv(8:end), '"')); xlabel('Time(s)');ylabel('Amplitude')
+    subplot(2,3,1)
+    plot(t,data);
+    title(strcat('The waveform - "', fileMv(8:end), '"')); 
+    xlabel('Time (secs)');
+    ylabel('Amplitude')
     
     
     %Narrowband Spectrogram and WideBand Spectrogram
-    N = 512;
-    subplot(3,2,3)
-    spectrogram(x,hamming(N/4),round(0.9*N/4),N,fs);
-    title('NarrowBand Spectrogram');
+    windLen = 512;
+    subplot(2,3,3)
+    rounded = round(1 / 4 * 0.89 * windLen)
+    spectrogram(data,hamming(windLen * 1 / 4),rounded,windLen,fs);
+    title('Spectrogram');
     
-    N = 512;
-    subplot(3,2,5)
-    win = hamming(N);
-    spectrogram(x,win,round(0.97*N),N,fs);
-    title('Wideband spectrogram');
+    % Fourier transform is implemented below
+    Y=fft(hamming(length(data)) .* data);
+   
+    %Plotting the cepstrum values
+    subplot(2,3,5);
     
-    % do fourier transform of windowed signal
-    Y=fft(x.*hamming(length(x)));
-    %
-    % plot spectrum of bottom 5000Hz
-    hz5000=5000*length(Y)/fs;
-    f=(0:hz5000)*fs/length(Y);
-    subplot(3,2,5);
+    % The built-in function "cceps" could have also been used here
+    % Cepstrum can be defined as the fft taking the log-spectrum as input
+    C=fft(log(eps + abs(Y)));
     
-    % cceps could have also been used
-    % cepstrum is DFT of log spectrum
-    C=fft(log(abs(Y)+eps));
-    %5
-    % plot between 1ms (=1000Hz) and 20ms (=50Hz)
-    ms1 = 1;
-    ms20 = length(x);
-    q=(ms1:ms20)/fs;
-    plot(q,abs(C(ms1:ms20)));
-    title('Cepstrum');
-    xlabel('Quefrency (s)');
+    
+    firstVal = 1;
+    secVal = length(data);
+    q=(firstVal:secVal)/fs;
+    plot(q,abs(C));
+    title('Cepstrum values');
+    xlabel('Quefrency (sec)');
     ylabel('Amplitude');
-    %--------------------------------------------------------------------------
+
     
     %Time Waveform of Phoneme
     xa = 0.06;                 % These values where varied according to the respective waveform of the word being plotted
     xb = 0.17;
-    subplot(3,2,2)
-    plot(t,x)
+    subplot(2,3,2)
+    plot(t,data)
     xlim([xa xb])
     title('Time Waveform of Phoneme ')
     xlabel('Time (s)')
     ylabel('Amplitude')
     
-    ms1=fs/1000;                 % maximum speech Fx at 1000Hz
-    ms20=fs/50;                  % minimum speech Fx at 50Hz
+    firstVal=fs/1000;                 % maximum speech Fx at 1000Hz
+    secVal=fs/50;                  % minimum speech Fx at 50Hz
     
-    Y=fft(x.*hamming(length(x)));
+    Y=fft(data.*hamming(length(data)));
     %
     % plot spectrum of bottom 5000Hz
     hz5000=5000*length(Y)/fs;
     f=(0:hz5000)*fs/length(Y);
-    subplot(3,2,2);
+    subplot(2,3,2);
     plot(f,20*log10(abs(Y(1:length(f)))+eps));
     title('Spectrum');
     xlabel('Frequency (Hz)');
@@ -103,13 +98,13 @@ for u = 1:length(allData)
     
     %Extracting 30 ms of the waveform
     xstart = 0.05;
-    subplot(3,2,4)
-    plot(t,x)
+    subplot(2,3,4)
+    plot(t,data)
     xlim([(xstart) (xstart+.030)])
     title('Time Waveform of 30 ms of the Phoneme')
     xlabel('Time (s)')
     ylabel('Amplitude')
-    sample=x(xstart*fs:(xstart+.030)*fs);
+    sample=data(xstart*fs:(xstart+.030)*fs);
     
     
     
@@ -117,9 +112,9 @@ for u = 1:length(allData)
     C=fft(log(abs(Y)+eps));
     %
     % plot between 1ms (=1000Hz) and 20ms (=50Hz)
-    q=(ms1:ms20)/fs;
-    subplot(3,2,4);
-    plot(q,abs(C(ms1:ms20)));
+    q=(firstVal:secVal)/fs;
+    subplot(2,3,4);
+    plot(q,abs(C(firstVal:secVal)));
     title('Cepstrum');
     xlabel('Quefrency (s)');
     ylabel('Amplitude');
@@ -135,8 +130,8 @@ for u = 1:length(allData)
     %Magnitude Spectrum and Linear Prediction Spectral Envelope
     mag = abs(fft(sample,1024));
     mag = mag(1:512);
-    freq = 0:8000/N:8000-1;
-    subplot(3,2,6)
+    freq = 0:8000/windLen:8000-1;
+    subplot(2,3,6)
     plot(freq,db(mag/1024));      % divide by 1024 to normalize after fourier transform
     axis tight; grid on; title('Magnitude Spectrum and Smoothed Spectral Envelope');
     xlabel('Frequency (Hz)'); ylabel('|X(f)| (dB)');
@@ -147,7 +142,7 @@ for u = 1:length(allData)
     p=fs/1000 + 4;
     [a,g]=lpc(sample,p);
     lspec = freqz(g,a,freq,fs);
-    subplot(3,2,6)
+    subplot(2,3,6)
     plot(freq, 20*log10(abs(lspec)),'r');
     axis tight;
     title('Magnitude Spectrum in Blue & Smoothed Spectral Envelope in Black');
@@ -160,36 +155,41 @@ for u = 1:length(allData)
     %FORMANT FREQUENCY SECTION
     clear y Fs;
     
-    % Read the data back into MATLAB, and listen to audio.
     
-    [x, Fs] = wavread(fileMv);
+    [data, Fs] = wavread(fileMv);
     
-    sound(x, Fs);
+    %The file is listened through the below code
+    sound(data, Fs);
     
-    %Below, spectral density is implemented
-    
-    
+    %The features of frames are given below
     overlappNo = 95;
     
     len_ = 110;
     
     NFFT = 128;
     
+    %Hamming window is utilized
+    xMod = data.*hamming(size(data, 1));
     
-    xMod = x.*hamming(size(x, 1));
-    
+    %Filtering is performed below
     xMod = filter(1,[1 0.7],xMod);
     
+    %In this homework, we were supposed to take the number of formants as 2
     noFormants = 2;
-    A = lpc(xMod,noFormants *3 + 2);
-    roots_ = roots(A);
+    
+    %LPC method
+    output = lpc(xMod,noFormants *3 + 2);
+    
+    %In order to extract the formant frequencies, the mathematical
+    %equations below are performed
+    roots_ = roots(output);
     
     
     roots_ = roots_(imag(roots_)>=0);
     angulars_ = atan2(imag(roots_),real(roots_));
     
-    [freks,ind_] = sort(angulars_.*(Fs/(2*pi)));
-    bandwidth_ = -1/2*(Fs/(2*pi))*log(abs(roots_(ind_)));
+    [freks,ind_] = sort(angulars_.*(Fs/2/pi));
+    bandwidth_ = -1/2*log(abs(roots_(ind_)))*(Fs/(2*pi));
     
     formantVals = [];
     formNo = 1;
@@ -205,7 +205,8 @@ for u = 1:length(allData)
         it_ = it_ + 1;
     end
     fileMv(8:end)
-    formantVals
+    %The top 2 formant frequencies
+    formantVals(end:-1:end-1)
 end
 
 
