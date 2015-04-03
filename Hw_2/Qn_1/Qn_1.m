@@ -1,10 +1,18 @@
+%Cem Rýfký Aydýn 2013800054
+%CmpE58P - MACHINE LISTENING: Homework II
+%Question 3
+
+%All past data get cleared
 clear all;
 close all;
 clc;
+
+%All the vowels are stored in the following directory called 'vowels'
 files = dir('vowels');
 
 fileN = [];
 
+%We iterate over the files in the directory through the below loop
 for file = files';
     
     if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
@@ -18,8 +26,8 @@ allData = cellstr(fileN);
 for u = 1:length(allData)
     
     
-    fileMv = allData(u);
-    fileMv = char(fileMv);
+    fileMv = char(allData(u));
+    
     
     %%
     
@@ -149,53 +157,55 @@ for u = 1:length(allData)
     
     %%
     
-    %FORMANT FREQUENCIES
+    %FORMANT FREQUENCY SECTION
     clear y Fs;
     
     % Read the data back into MATLAB, and listen to audio.
     
-    [y, Fs, nbits, readinfo] = wavread(fileMv);
+    [x, Fs] = wavread(fileMv);
     
-    sound(y, Fs);
+    sound(x, Fs);
     
     %Below, spectral density is implemented
     
-    len = 100;
     
-    noverlap = 90;
+    overlappNo = 95;
+    
+    len_ = 110;
     
     NFFT = 128;
     
-    [y_,freq,time,p] = spectrogram(y,len,noverlap,NFFT,Fs);
     
-    x = y;
+    xMod = x.*hamming(size(x, 1));
     
-    x1 = x.*hamming(length(x));
+    xMod = filter(1,[1 0.7],xMod);
     
-    preemph = [1 0.63];
-    x1 = filter(1,preemph,x1);
-    
-    
-    A = lpc(x1,8);
-    rts = roots(A);
+    noFormants = 2;
+    A = lpc(xMod,noFormants *3 + 2);
+    roots_ = roots(A);
     
     
-    rts = rts(imag(rts)>=0);
-    angz = atan2(imag(rts),real(rts));
+    roots_ = roots_(imag(roots_)>=0);
+    angulars_ = atan2(imag(roots_),real(roots_));
     
-    [frqs,indices] = sort(angz.*(Fs/(2*pi)));
-    bw = -1/2*(Fs/(2*pi))*log(abs(rts(indices)));
+    [freks,ind_] = sort(angulars_.*(Fs/(2*pi)));
+    bandwidth_ = -1/2*(Fs/(2*pi))*log(abs(roots_(ind_)));
     
-    formants = [];
-    nn = 1;
-    for kk = 1:length(frqs)
-        if (frqs(kk) > 90 && bw(kk) <400)
-            formants(nn) = frqs(kk);
-            nn = nn+1;
+    formantVals = [];
+    formNo = 1;
+
+    it_ = 1;
+    while it_ <= length(freks)
+        if bandwidth_(it_) < 400
+            if (freks(it_) > 90)
+                formantVals(formNo) = freks(it_);
+                formNo = formNo+1;
+            end
         end
+        it_ = it_ + 1;
     end
     fileMv(8:end)
-    formants
+    formantVals
 end
 
 
