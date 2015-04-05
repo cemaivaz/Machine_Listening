@@ -81,13 +81,12 @@ for u = 1:length(allData)
         cumM_ = dist_(2:end) ./ (cumsum(dist_(2:end)) ./ (1:(range_)));   % cumulative mean - normalized
         
         % parabolic interpolation of all triplets to refine local minima
-        min_pos=1:length(cumM_);    % nominal position of each sample
-        
+        min_pos=1:numel(cumM_);    % nominal position of each sample
         x1 = cumM_(1:end-2);
         x2 = cumM_(2:end-1);
         x3 = cumM_(3:end);
-        a = .5 * (x1+x3-2*x2);
-        b = .5 * (x3-x1);
+        a = (x1+x3-2*x2)/2;
+        b = (x3-x1)/2;
         shift = -b./(2*a);        % offset of interpolated minimum re current sample
         val = x2-b.^2./(4*a);     % value of interpolated minimum
         
@@ -147,7 +146,7 @@ for u = 1:length(allData)
     
     
     
-    fileMv(8:end)
-    fs ./ r.prd
+%     fileMv(8:end)
+%     fs ./ r.prd
     
 end
