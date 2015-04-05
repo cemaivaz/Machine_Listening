@@ -150,7 +150,9 @@ for u = 1:length(allData)
     plot(timeData / l:timeData / l:timeData, fundFreqs,'-');
     hold on;
     plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
-    
+    title(fileMv(8:end));
+    xlabel('Time (sec)');
+    ylabel('Fund. freq (Hz)');
 end
 
 
@@ -170,13 +172,23 @@ end
 
 allData = cellstr(fileN);
 
-for u = 1:length(allData)
+for k = 1:length(allData)
     
-    
-    fileMv = char(allData(u));
+    figure(k + u);
+    fileMv = char(allData(k));
     
     
     plug = dlmread(fileMv);
-    plug(1,1)
-    plug(1, 2)
+
+    timeData = plug(:, 1);
+    fundFreqs = plug(:, 2);
+    plot(timeData, fundFreqs,'-');
+    hold on;
+    plot(timeData, fundFreqs, 'xr');
+    title(fileMv(8:end));
+    xlabel('Time (sec)');
+    ylabel('Fund. freq (Hz)');
+    fundFreqsTxt = num2str(fundFreqs);
+    text(timeData, fundFreqs, fundFreqsTxt, 'VerticalAlignment','bottom', ...
+                             'HorizontalAlignment','right')
 end
