@@ -41,41 +41,42 @@ for u = 1:length(allData)
     %    r.prd: period
     %    r.ap: aperiodicity measure
     %
-    %    per_.maxprd: samples, maximum of search range [default 100]
-    %    per_.minprd: samples, minimum of search range [default 2]
-    %    per_.wsize: samples, window size [default maxprd]
-    %    per_.hop: samples, frame period [default wsize]
-    %    per_.thre_: thre_old for period minimum [default: 0.1]
-    %    per_.smooth: samples, size of low-pass smoothing window [default: minprd/2]
+    %    maxprd: samples, maximum of search range [default 100]
+    %    minprd: samples, minimum of search range [default 2]
+    %    wsize: samples, window size [default maxprd]
+    %    skip: samples, frame period [default wsize]
+    %    thre_: thre_old for period minimum [default: 0.1]
+    %    smooth: samples, size of low-pass smoothing window [default: minprd/2]
     
     
     % defaults
-    per_.thre_=0.11;
-    per_.maxprd=256;
+    thre_=0.11;
+    maxprd=256;
 
-    per_.wsize=per_.maxprd;
-    per_.hop=per_.wsize;
+    wsize=maxprd;
+    skip=wsize;
 
+    dataSize=length(x);
     x=x(:);
-    dataSize=numel(x);
     
-    frameNo=floor((dataSize-per_.maxprd-per_.wsize)/per_.hop);
-    pwr=zeros(1,frameNo);
-    prd=zeros(1,frameNo);
-    ap=zeros(1,frameNo);
+    
+    frameNo=floor((dataSize-maxprd-wsize)/skip);
+    pwr=ones(1,frameNo);
+    prd=ones(1,frameNo);
+    ap=ones(1,frameNo);
     
     % shifted data
-    x=convmtx(x,per_.maxprd+1);
-    x=x(per_.maxprd:end-per_.maxprd,:);
+    x=convmtx(x,maxprd+1);
+    x=x(maxprd:end-maxprd,:);
     
     
     k = 1;
     while k <= frameNo
         
-        st_=(k-1)*per_.hop; % offset of frame
-        xx=x(st_+1:st_+per_.wsize,:);
-        d=mean( (xx - repmat(xx(:,1),1,per_.maxprd+1)).^2 )/2;     % squared difference function
-        dd= d(2:end) ./ (cumsum(d(2:end)) ./ (1:(per_.maxprd)));   % cumulative mean - normalized
+        st_=(k-1)*skip; % offset of frame
+        xx=x(st_+1:st_+wsize,:);
+        d=mean( (xx - repmat(xx(:,1),1,maxprd+1)).^2 )/2;     % squared difference function
+        dd= d(2:end) ./ (cumsum(d(2:end)) ./ (1:(maxprd)));   % cumulative mean - normalized
         
         % parabolic interpolation of all triplets to refine local minima
         min_pos=1:numel(dd);    % nominal position of each sample
@@ -93,7 +94,7 @@ for u = 1:length(allData)
         min_pos(idx)=min_pos(idx-1)+shift(idx-1);
         
         % find index of first min below thre_old
-        a=dd<per_.thre_;
+        a=dd<thre_;
         if isempty(find(a))
             [~,prd0]=min(dd); % none below thre_old, take global min instead
         else
