@@ -115,7 +115,7 @@ for u = 1:length(allData)
             indMin = -1 + b_ + indMin;
         end
         
-        period_=positionsMin(indMin);
+        period_ = positionsMin(indMin);
         period_ = period_ + 1;
         
         if dist_(indMin) < dist_(indMin+1)
@@ -129,8 +129,9 @@ for u = 1:length(allData)
                         a_= .5 * (firstX + thirdX - 2. * secX);
                         b_= .5 * (thirdX - firstX);
                         sh_= -b_ ./ a_ ./ 2;        % offset of interpolated minimum re current sample
-                        output=secX - b_ .^ 2 ./ a_ ./ 4;     % value of interpolated minimum
-                        period_=period_+sh_-1;
+                        output = secX - b_ .^ 2 ./ a_ ./ 4;     % value of interpolated minimum
+                        period_ = period_+sh_;
+                        period_ = period_ - 1.;
                     end
                 end
             end
@@ -142,16 +143,16 @@ for u = 1:length(allData)
         if fr_ == .0
             xRes = xSub(:,period_);
         else
-            xRes = (1 - fr_) .* xSub(:, floor(period_ + 1));
-            xRes = xRes + fr_ .* xSub(:, floor(period_ + 1) + 1);% linear interpolation
+            xRes = xSub(:, floor(period_ + 1)) .* (1 - fr_);
+            xRes = xRes + xSub(:, floor(period_ + 1) + 1) .* fr_;% linear interpolation
         end
-        p_=(mean(power(xSub(:, 1), 2)) + mean(power(xRes, 2)))/2; % average power over fixed and shifted windows
-        result = mean(power(((xSub(:, 1) - xRes)), 2)) / 2;
+        p_ = .5 * (mean(power(xSub(:, 1), 2)) + mean(power(xRes, 2))); % average power over fixed and shifted windows
+        result = .5 * mean(power(((xSub(:, 1) - xRes)), 2));
         aperiod = result ./ p_;
         
         
-        yin.period_(k)=period_;
-        yin.aperiod(k)=aperiod;
+        yin.period_(k) = period_;
+        yin.aperiod(k) = aperiod;
         
         k = k + 1;
     end
