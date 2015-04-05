@@ -152,3 +152,31 @@ for u = 1:length(allData)
     plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
     
 end
+
+
+%All the vowels are stored in the following directory called 'vowels'
+files = dir('pluginVals');
+
+fileN = [];
+
+%We iterate over the files in the directory through the below loop
+for file = files';
+    
+    if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
+        fileN = [fileN; char(strcat(strcat('pluginVals\', char(file.name))))];
+    end
+    
+end
+
+allData = cellstr(fileN);
+
+for u = 1:length(allData)
+    
+    
+    fileMv = char(allData(u));
+    
+    
+    plug = dlmread(fileMv);
+    plug(1,1)
+    plug(1, 2)
+end

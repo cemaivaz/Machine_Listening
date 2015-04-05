@@ -32,24 +32,11 @@ for u = 1:length(allData)
     p = [];
     [data fs] = wavread(fileMv);
     
-    % YIN2: a simple implementation of the yin period-estimation algorithm
-    %
-    %  yin2(data) : plot the period, power, and aperiodicity as a function of time
-    %
-    %  r=yin2(data,p): use parameters in p, return result in r:
-    %
-    %    yin.prd: period
-    %    yin.ap: aperiodicity measure
-    %
-    %    maxprd: samples, maximum of search range [default 100]
-    %    minprd: samples, minimum of search range [default 2]
-    %    wsize: samples, window size [default maxprd]
-    %    skip: samples, frame period [default wsize]
-    %    thre_: thre_old for period minimum [default: 0.1]
-    %    smooth: samples, size of low-pass smoothing window [default: minprd/2]
+    timeData = length(data) / fs;
     
     
-    % defaults
+    %My implementation for YIN algorithm is given below. I utilized
+    %interpolating parabolic equation for it.
     
     dataSize = length(data);
     
@@ -57,13 +44,12 @@ for u = 1:length(allData)
     range_ = 256;
     
     windLen = range_;
-    skip = windLen;
+    skip = windLen; %It denotes the frame period
     
     
     frameNo = floor((dataSize - range_ - windLen) / skip); %The number of frames
     
     
-    aperiod = ones(1, frameNo);
     period_ = ones(1, frameNo);
     p_ = ones(1, frameNo); %pwr
     
@@ -90,7 +76,7 @@ for u = 1:length(allData)
         firstX = cumM_(1:length(cumM_)-2);
         secX = cumM_(2:length(cumM_)-1);
         thirdX = cumM_(3:length(cumM_));
-        %Parabola coefficients in accordance with the algorithm I developed
+        %Parabolic coefficients in accordance with the algorithm I developed
         %are given below
         a_ = .5 * (firstX + thirdX - 2. * secX);
         b_ = .5 * (thirdX - firstX);
@@ -102,7 +88,7 @@ for u = 1:length(allData)
         cumM_(ind_) = output(-1. + ind_);
         positionsMin(ind_) = positionsMin(-1. + ind_) + sh_(-1. + ind_);
         
-        % Minimum values are getting extracted below
+        %Minimum values are getting extracted below
         
         a_ = zeros(length(cumM_));
         for o_ = 1:length(cumM_)
@@ -126,7 +112,8 @@ for u = 1:length(allData)
         period_ = positionsMin(indMin);
         period_ = period_ + 1;
         
-        %Parabola values and coefficients being used
+        %Parabola values and coefficients being used for extracting the
+        %period value
         if dist_(indMin) < dist_(indMin+1)
             if period_ < length(cumM_)
                 if dist_(indMin) < dist_(indMin-1)
@@ -146,25 +133,48 @@ for u = 1:length(allData)
             end
         end
         
-        % aperiodicity
-        fr_ = period_;
-        fr_ = fr_ - floor(period_);
-        if fr_ == .0
-            xRes = xSub(:,period_);
-        else
-            xRes = xSub(:, floor(period_ + 1)) .* (1 - fr_);
-            xRes = xRes + xSub(:, floor(period_ + 1) + 1) .* fr_;% linear interpolation
-        end
-        p_ = .5 * (mean(power(xSub(:, 1), 2)) + mean(power(xRes, 2))); % average power over fixed and shifted windows
-        result = .5 * mean(power(((xSub(:, 1) - xRes)), 2));
-       
-        
         yin.period_(k) = period_;
         
         k = k + 1;
     end
 
-    fileMv(8:end)
-    fs ./ yin.period_
     
+    fileMv(8:end)
+    %Fundamental frequencies getting printed below
+    fundFreqs = fs ./ yin.period_
+    
+    
+    
+    figure(u)
+    l = length(fundFreqs);
+    plot(timeData / l:timeData / l:timeData, fundFreqs,'-');
+    hold on;
+    plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
+    
+end
+
+
+%All the vowels are stored in the following directory called 'vowels'
+files = dir('pluginVals');
+
+fileN = [];
+
+%We iterate over the files in the directory through the below loop
+for file = files';
+    
+    if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
+        fileN = [fileN; char(strcat(strcat('pluginVals\', char(file.name))))];
+    end
+    
+end
+
+allData = cellstr(fileN);
+
+for u = 1:length(allData)
+    
+    
+    fileMv = char(allData(u));
+    
+    
+    p = [];
 end
