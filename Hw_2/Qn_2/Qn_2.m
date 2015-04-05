@@ -67,8 +67,8 @@ for u = 1:length(allData)
     period_ = ones(1, frameNo);
     p_ = ones(1, frameNo); %pwr
     
-    % shifted data
-    data = convmtx(data, range_ + 1.);
+    
+    data = convmtx(data, range_ + 1.); % Data gets shifted
     
     k = 1;
     data = data(range_:end-range_,:);
@@ -148,11 +148,9 @@ for u = 1:length(allData)
         end
         p_ = .5 * (mean(power(xSub(:, 1), 2)) + mean(power(xRes, 2))); % average power over fixed and shifted windows
         result = .5 * mean(power(((xSub(:, 1) - xRes)), 2));
-        aperiod = result ./ p_;
-        
+       
         
         yin.period_(k) = period_;
-        yin.aperiod(k) = aperiod;
         
         k = k + 1;
     end
