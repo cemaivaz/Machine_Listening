@@ -190,7 +190,7 @@ for k = 1:length(allData)
     plot(timeData, fundFreqs,'-');
     hold on;
     plot(timeData, fundFreqs, 'xr');
-    title(fileMv(8:end));
+    title(fileMv(12:end));
     xlabel('Time (sec)');
     ylabel('Fund. freq (Hz)');
     fundFreqsTxt = num2str(floor(fundFreqs));
