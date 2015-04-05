@@ -153,6 +153,11 @@ for u = 1:length(allData)
     title(fileMv(8:end));
     xlabel('Time (sec)');
     ylabel('Fund. freq (Hz)');
+    fundFreqsTxt = num2str(floor(fundFreqs)');
+
+    hold on;
+    text(timeData / l:timeData / l:timeData, fundFreqs, fundFreqsTxt, 'VerticalAlignment','bottom', ...
+        'HorizontalAlignment','right')
 end
 
 
@@ -188,7 +193,7 @@ for k = 1:length(allData)
     title(fileMv(8:end));
     xlabel('Time (sec)');
     ylabel('Fund. freq (Hz)');
-    fundFreqsTxt = num2str(fundFreqs);
+    fundFreqsTxt = num2str(floor(fundFreqs));
     text(timeData, fundFreqs, fundFreqsTxt, 'VerticalAlignment','bottom', ...
                              'HorizontalAlignment','right')
 end
