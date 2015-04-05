@@ -1,6 +1,6 @@
 %Cem Rýfký Aydýn 2013800054
 %CmpE58P - MACHINE LISTENING: Homework II
-%Question 2
+%Question 2 - Idiophone instruments
 
 %All past data get cleared
 clear all;
@@ -8,7 +8,7 @@ close all;
 clc;
 
 %All the vowels are stored in the following directory called 'vowels'
-files = dir('vowels');
+files = dir('Instruments');
 
 fileN = [];
 
@@ -16,7 +16,7 @@ fileN = [];
 for file = files';
     
     if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
-        fileN = [fileN; char(strcat(strcat('vowels\', char(file.name))))];
+        fileN = [fileN; char(strcat(strcat('Instruments\', char(file.name))))];
     end
     
 end
@@ -139,7 +139,7 @@ for u = 1:length(allData)
     end
 
     
-    fileMv(8:end)
+    fileMv(13:end)
     %Fundamental frequencies getting printed below
     fundFreqs = fs ./ yin.period_
     
@@ -150,12 +150,18 @@ for u = 1:length(allData)
     plot(timeData / l:timeData / l:timeData, fundFreqs,'-');
     hold on;
     plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
-    
+    tit = strcat(fileMv(13:end), ' - My YIN version')
+    title(tit);
+
+    xlabel('Time (sec)');
+    ylabel('Fund. freq (Hz)');
+    fundFreqsTxt = num2str(floor(fundFreqs)');
+
 end
 
 
 %All the vowels are stored in the following directory called 'vowels'
-files = dir('pluginVals');
+files = dir('pluginValsInstr');
 
 fileN = [];
 
@@ -163,18 +169,76 @@ fileN = [];
 for file = files';
     
     if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
-        fileN = [fileN; char(strcat(strcat('pluginVals\', char(file.name))))];
+        fileN = [fileN; char(strcat(strcat('pluginValsInstr\', char(file.name))))];
     end
     
 end
 
 allData = cellstr(fileN);
 
-for u = 1:length(allData)
+for k = 1:length(allData)
     
+    figure(k + u);
+    fileMv = char(allData(k));
     
-    fileMv = char(allData(u));
+    boolVal = ' - yin';
+    if strcmp(fileMv(21), 'P') == 0
+        plug = dlmread(fileMv);
+        
+        boolVal = ' - pyin';
+        timeData = plug(:, 1);
+        fundFreqs = plug(:, 2);
+    else
+        [tim_ fr_ str] = textread(fileMv, '%.22f %.22f %s')
+        timeData = tim_;
+        fundFreqs = fr_;
+    end
+    plot(timeData, fundFreqs,'-');
+    hold on;
+    plot(timeData, fundFreqs, 'xr');
+    tit_ = strcat(fileMv(17:end), boolVal);
+    title(tit_);
+    xlabel('Time (sec)');
+    ylabel('Fund. freq (Hz)');
+    fundFreqsTxt = num2str(floor(fundFreqs));
     
+end
+
+
+
+%All the vowels are stored in the following directory called 'vowels'
+files = dir('manualAnnotation');
+
+fileN = [];
+
+%We iterate over the files in the directory through the below loop
+for file = files';
     
-    p = [];
+    if strcmp(file.name, '.') == 0 && strcmp(file.name, '..') == 0
+        fileN = [fileN; char(strcat(strcat('manualAnnotation\', char(file.name))))];
+    end
+    
+end
+
+allData = cellstr(fileN);
+
+for l_ = 1:length(allData)
+    
+    figure(l_ + k + u);
+    fileMv = char(allData(l_));
+    
+    plug = dlmread(fileMv);
+    
+    timeData = plug(:, 1);
+    fundFreqs = plug(:, 2);
+    
+    plot(timeData, fundFreqs,'-');
+    hold on;
+    plot(timeData, fundFreqs, 'xr');
+    tit = strcat(fileMv(18:end), ' - Manual annotation')
+    title(tit);
+    xlabel('Time (sec)');
+    ylabel('Fund. freq (Hz)');
+    fundFreqsTxt = num2str(floor(fundFreqs));
+    
 end

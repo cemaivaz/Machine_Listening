@@ -150,7 +150,8 @@ for u = 1:length(allData)
     plot(timeData / l:timeData / l:timeData, fundFreqs,'-');
     hold on;
     plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
-    title(fileMv(8:end));
+    tit_ = strcat(fileMv(8:end), ' - my version (fund. freq.)');
+    title(tit_);
     xlabel('Time (sec)');
     ylabel('Fund. freq (Hz)');
     fundFreqsTxt = num2str(floor(fundFreqs)');
@@ -190,7 +191,9 @@ for k = 1:length(allData)
     plot(timeData, fundFreqs,'-');
     hold on;
     plot(timeData, fundFreqs, 'xr');
-    title(fileMv(12:end));
+        tit_ = strcat(fileMv(12:end), ' - Plug-in (fund. freq.)');
+    title(tit_);
+    
     xlabel('Time (sec)');
     ylabel('Fund. freq (Hz)');
     fundFreqsTxt = num2str(floor(fundFreqs));
