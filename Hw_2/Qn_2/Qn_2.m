@@ -71,6 +71,7 @@ for u = 1:length(allData)
     x=convmtx(x,range_+1);
     x=x(range_:end-range_,:);
     
+    size(x)
     
     k = 1;
     while k <= frameNo
