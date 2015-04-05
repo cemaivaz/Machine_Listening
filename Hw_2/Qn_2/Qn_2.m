@@ -130,14 +130,14 @@ for u = 1:length(allData)
         end
         
         % aperiodicity
-        frac=period_-floor(period_);
-        if frac == 0
-            yy = xSub(:,period_);
+        fr_=period_-floor(period_);
+        if fr_ == 0
+            xRes = xSub(:,period_);
         else
-            yy = (1-frac)*xSub(:,floor(period_+1)) + frac * xSub(:,floor(period_ + 1)+1); % linear interpolation
+            xRes = (1-fr_)*xSub(:,floor(period_+1)) + fr_ * xSub(:,floor(period_ + 1)+1); % linear interpolation
         end
-        p_=(mean(power(xSub(:,1), 2)) + mean(yy.^2))/2; % average power over fixed and shifted windows
-        result = mean(power(((xSub(:,1) - yy)), 2)) / 2;
+        p_=(mean(power(xSub(:, 1), 2)) + mean(power(xRes, 2)))/2; % average power over fixed and shifted windows
+        result = mean(power(((xSub(:, 1) - xRes)), 2)) / 2;
         aperiod = result/p_;
         
         
