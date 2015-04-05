@@ -32,6 +32,9 @@ for u = 1:length(allData)
     p = [];
     [data fs] = wavread(fileMv);
     
+    timeData = length(data) / fs;
+    
+    
     %My implementation for YIN algorithm is given below. I utilized
     %interpolating parabolic equation for it.
     
@@ -138,6 +141,14 @@ for u = 1:length(allData)
     
     fileMv(8:end)
     %Fundamental frequencies getting printed below
-    fs ./ yin.period_
+    fundFreqs = fs ./ yin.period_
+    
+    
+    
+    figure(u)
+    l = length(fundFreqs);
+    plot(timeData / l:timeData / l:timeData, fundFreqs,'-');
+    hold on;
+    plot(timeData / l:timeData / l:timeData, fundFreqs, 'xr');
     
 end
