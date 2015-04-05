@@ -62,7 +62,7 @@ for u = 1:length(allData)
     x=x(:);
     
     
-    frameNo=floor((dataSize-range_-wsize) / skip);
+    frameNo = floor((dataSize - range_ - wsize) / skip);
     pwr = ones(1, frameNo);
     prd = ones(1, frameNo);
     ap = ones(1, frameNo);
@@ -75,26 +75,26 @@ for u = 1:length(allData)
     k = 1;
     while k <= frameNo
         
-        st_ = (k-1) * skip; % offset of frame
-        xSub = x(st_+1:st_+wsize,:);
-        dist_ = mean(power(xSub - repmat(xSub(:,1),1,range_+1), 2))/2;     % squared difference function
+        st_ = k * skip - skip; % offset of frame
+        xSub = x(st_ + 1:st_ + wsize,:);
+        dist_ = .5 * mean(power(xSub - repmat(xSub(:,1),1,range_+1), 2));     % squared difference function
         cumM_ = dist_(2:end) ./ (cumsum(dist_(2:end)) ./ (1:(range_)));   % cumulative mean - normalized
         
         % parabolic interpolation of all triplets to refine local minima
         min_pos=1:length(cumM_);    % nominal position of each sample
         
-        x1 = cumM_(1:end-2);
-        x2 = cumM_(2:end-1);
-        x3 = cumM_(3:end);
-        a = .5 * (x1+x3-2*x2);
-        b = .5 * (x3-x1);
-        shift = -b./(2*a);        % offset of interpolated minimum re current sample
-        val = x2-b.^2./(4*a);     % value of interpolated minimum
+        firstX = cumM_(1:length(cumM_)-2);
+        secX = cumM_(2:length(cumM_)-1);
+        thirdX = cumM_(3:length(cumM_));
+        a = .5 * (firstX + thirdX - 2*secX);
+        b = .5 * (thirdX - firstX);
+        sh_ = -b./(2*a);        % offset of interpolated minimum re current sample
+        val = secX-b.^2./(4*a);     % value of interpolated minimum
         
         % replace all local minima by their interpolated value,
-        idx= 1 + find(x2<x1 & x2<x3);
-        cumM_(idx)=val(idx-1);
-        min_pos(idx)=min_pos(idx-1)+shift(idx-1);
+        idx = 1 + find(secX<firstX & secX<thirdX);
+        cumM_(idx) = val(idx-1);
+        min_pos(idx) = min_pos(idx-1)+sh_(idx-1);
         
         % find index of first min below thre_old
         a=cumM_<thre_;
@@ -114,14 +114,14 @@ for u = 1:length(allData)
                 if dist_(prd0)<dist_(prd0-1)
                     if dist_(prd0)<dist_(prd0+1)
                         % refine by parabolic interpolation of raw difference function
-                        x1=dist_(prd-1);
-                        x2=dist_(prd);
-                        x3=dist_(prd+1);
-                        a=(x1+x3-2*x2)/2;
-                        b=(x3-x1)/2;
-                        shift=-b./(2*a);        % offset of interpolated minimum re current sample
-                        val=x2-b.^2./(4*a);     % value of interpolated minimum
-                        prd=prd+shift-1;
+                        firstX=dist_(prd-1);
+                        secX=dist_(prd);
+                        thirdX=dist_(prd+1);
+                        a=(firstX+thirdX-2*secX)/2;
+                        b=(thirdX-firstX)/2;
+                        sh_=-b./(2*a);        % offset of interpolated minimum re current sample
+                        val=secX-b.^2./(4*a);     % value of interpolated minimum
+                        prd=prd+sh_-1;
                     end
                 end
             end
@@ -135,7 +135,7 @@ for u = 1:length(allData)
             yy=(1-frac)*xSub(:,floor(prd+1))+frac*xSub(:,floor(prd+1)+1); % linear interpolation
         end
         pwr=(mean(xSub(:,1).^2) + mean(yy.^2))/2; % average power over fixed and shifted windows
-        res=mean(((xSub(:,1) - yy)).^2) / 2;
+        res=mean(power(((xSub(:,1) - yy)), 2)) / 2;
         ap=res/pwr;
         
         
