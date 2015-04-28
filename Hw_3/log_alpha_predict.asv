@@ -1,0 +1,9 @@
+function [ output_args ] = log_alpha_predict( input_args )
+%LOG_ALPHA_PREDICT Summary of this function goes here
+%   Detailed explanation goes here
+mx = max(alpha(:, t - 1));
+p = exp(alpha(:, t - 1) - mx);
+lpp =
+
+end
+
