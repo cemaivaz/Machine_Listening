@@ -55,6 +55,7 @@ for t=1:K,
         %
         log_alpha_predict(:, t) = state_predict(hm.A, log_alpha(:, t-1));
     end
+    log_alpha(:, t) = state_update(hm.C(obs(t) + 1, :), log_alpha_predict(:, t));
 %     log_alpha(:,t) = log_alpha_predict(:,t).*(C(obs(t)+1,:)');
 %     log_alpha(:,t) = log_alpha(:,t)./sum(log_alpha(:,t));
 
@@ -76,26 +77,29 @@ set(gca,'FontSize',20)
 
 %% backward pass
 
-beta = zeros(N, K);
-beta_postdict = zeros(N, K);
+log_beta = zeros(N, K);
+log_beta_postdict = zeros(N, K);
 for t=K:-1:1,
     if t==K,
-        beta_postdict(:,t) = ones(N,1);
+        log_beta_postdict(:,t) = ones(N,1);
+        
     else
-        beta_postdict(:,t) = hm.A'*beta(:,t+1);
+        log_beta_postdict(:, t) = state_postdict(hm.A, log_beta(:, t + 1));
+%         log_beta_postdict(:,t) = hm.A'*log_beta(:,t+1);
     end;
-    beta(:, t) = hm.C(obs(t)+1, :)' .* beta_postdict(:,t);
-    beta(:,t) = beta(:,t)./sum(beta(:,t));
+    log_beta(:, t) = state_update(hm.C(obs(t) + 1, :), log_beta_postdict(:, t));
+%     log_beta(:, t) = hm.C(obs(t)+1, :)' .* log_beta_postdict(:,t);
+%     log_beta(:,t) = log_beta(:,t)./sum(log_beta(:,t));
 end;
 
 subplot(211)
-imagesc(beta)
+imagesc(log_beta)
 hold on
 plot(state,'w--','LineWidth',2);
 title('Update messages','FontSize',20)
 set(gca,'FontSize',20)
 subplot(212)
-imagesc(beta_postdict)
+imagesc(log_beta_postdict)
 hold on
 plot(state,'w--','LineWidth',2);
 title('Postdict messages','FontSize',20)
@@ -103,7 +107,7 @@ set(gca,'FontSize',20)
 
 %% Smoothing
 
-gamma = log_alpha .* beta_postdict; 
+gamma = log_alpha .* log_beta_postdict; 
 
 subplot(211)
 hold off
