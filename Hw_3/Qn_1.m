@@ -1,6 +1,6 @@
 %% setup parameter structure
 
-K = 200; %length of sequence, e.g. at sampling period of 100ms: 50s 
+K = 300; %length of sequence, e.g. at sampling period of 100ms: 50s 
 N = 16; %number of states: how many dicisions has a bar?
 eps = 0.6; %probability to advance, higher value: higher tempo
 nu = 0.9; %probability to observe onset on downbeat
@@ -81,7 +81,7 @@ log_beta = zeros(N, K);
 log_beta_postdict = zeros(N, K);
 for t=K:-1:1,
     if t==K,
-        log_beta_postdict(:,t) = ones(N,1);
+        log_beta_postdict(:,t) = zeros(N,1);
         
     else
         log_beta_postdict(:, t) = state_postdict(hm.A, log_beta(:, t + 1));
@@ -107,11 +107,11 @@ set(gca,'FontSize',20)
 
 %% Smoothing
 
-gamma = log_alpha .* log_beta_postdict; 
+log_gamma = log_alpha + log_beta_postdict; 
 
 subplot(211)
 hold off
-imagesc(gamma)
+imagesc(log_gamma)
 hold on
 plot(state,'w--','LineWidth',2);
 title('Inferred posterior','FontSize',20)
